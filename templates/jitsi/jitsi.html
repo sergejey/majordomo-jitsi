@@ -1,0 +1,111 @@
+&nbsp;
+<script type="text/javascript">
+
+ function isMajorDroidClient() {
+  var ua = window.navigator.userAgent;
+  return true;
+ }
+
+ function getRoomURL() {
+  var url = "[#SERVER#]/"+getRoomTitle();
+  return url;
+ }
+
+ function getRoomTitle() {
+  return $('#room').val();
+ }
+
+ function sendTerminalCommand(terminal_id, cmd) {
+  var url="?";
+  url+='&terminal_id='+terminal_id+'&cmd='+cmd+'&room='+getRoomTitle();
+  $.ajax({
+   url: url
+  }).done(function(data) {
+   //alert(data);
+  });
+  return false;
+ }
+
+ function joinRoom() {
+  var url = 'app://run:net.jitsi.majordomo:room='+getRoomTitle();
+  if (!isMajorDroidClient()) {
+   url = getRoomURL();
+  }
+  window.location.href = url;
+  return false;
+ }
+
+ function watchRoom() {
+  var url = 'app://run:net.jitsi.majordomo:room='+getRoomTitle()+'&video=no&audio=no';
+  if (!isMajorDroidClient()) {
+   url = getRoomURL();
+  }
+  window.location.href = url;
+  return false;
+ }
+
+ function hangAll() {
+  [#begin TERMINALS#]
+  sendTerminalCommand([#ID#],'hang');
+  [#end TERMINALS#]
+  return false;
+ }
+
+ function updateWebURL() {
+  var url = getRoomURL();
+  $('#webRoomLink').html(url);
+  $('#webRoomLink').attr('href',url);
+ }
+
+ function copyURLtoClipboard() {
+
+  var temp = document.createElement("INPUT");
+  temp.value = getRoomURL();
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  temp.remove();
+  alert('URL copied to clipboard.');
+
+  return false;
+ }
+
+ $(document).ready(function() {
+  updateWebURL();
+ });
+
+</script>
+<form class="form">
+ <div class="form-group">
+  <label for="room">Room:</label>
+  <input type="text" name="room" id="room" value="[#ROOM#]" class="form-control" onkeyup="updateWebURL();">
+ </div>
+<table class="table">
+ [#begin TERMINALS#]
+ <tr>
+  <td>
+   <b>[#TITLE#]</b>
+  </td>
+  <td nowrap>
+   <a href="#" class="btn btn-default btn-success" onclick="sendTerminalCommand([#ID#],'call');return joinRoom();" title="Call"><i class="glyphicon glyphicon-phone-alt"></i></a>
+   <a href="#" class="btn btn-default btn-success" onclick="sendTerminalCommand([#ID#],'call');" title="Join"><i class="glyphicon glyphicon-plus"></i></a>
+   <a href="#" class="btn btn-default btn-warning" onclick="sendTerminalCommand([#ID#],'call');return watchRoom();" title="Watch"><i class="glyphicon glyphicon-eye-open"></i> </a>
+   <a href="#" class="btn btn-default btn-danger" onclick="return sendTerminalCommand([#ID#],'hang');" title="Hang"><i class="glyphicon glyphicon-off"></i></a>
+  </td>
+ </tr>
+ [#end TERMINALS#]
+</table>
+ <p>
+ <a href="#" class="btn btn-default btn-large btn-success" onclick="return joinRoom();"><i class="glyphicon glyphicon-plus"></i> JOIN ROOM</a>
+  &nbsp;
+ <a href="#" class="btn btn-default btn-large btn-warning" onclick="return watchRoom();"><i class="glyphicon glyphicon-eye-open"></i> WATCH</a>
+  &nbsp;
+  <a href="#" class="btn btn-default btn-large btn-danger" onclick="return hangAll();"><i class="glyphicon glyphicon-off"></i> ALL</a>
+ </p>
+</form>
+&nbsp;
+<p>
+<b>Web:</b> <a href="#" id="webRoomLink" target="_blank"></a>
+ <br/>
+ <a href="#" onclick="return copyURLtoClipboard();" class="btn btn-default">Copy</a>
+</p>
