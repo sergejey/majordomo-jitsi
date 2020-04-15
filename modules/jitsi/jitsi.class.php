@@ -115,7 +115,7 @@ function admin(&$out) {
 
     $this->getConfig();
 
-    $terminals = SQLSelect("SELECT * FROM terminals WHERE MAJORDROID_API=1 ORDER BY TITLE");
+    $terminals = SQLSelect("SELECT * FROM terminals WHERE (PLAYER_TYPE='majordroid' OR TTS_TYPE='majordroid') ORDER BY TITLE");
 
     $server = '';
     $room = gr('room');
